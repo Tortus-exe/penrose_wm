@@ -1,0 +1,7 @@
+[package]
+name = "penrose_wm"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+penrose = "0.4.0"
