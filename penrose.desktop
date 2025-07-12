@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Name=Penrose Window Manager
+Comment=Run Penrose from a desktop manager!
+Exec=run_penrose_loop
+Icon=
+Type=Application
+DesktopNames=Penrose
