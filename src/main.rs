@@ -13,7 +13,7 @@ use penrose::{
     },
     core::{
         bindings::{
-            click_handler, parse_keybindings_with_xmodmap, KeyEventHandler, MouseEventHandler,
+            parse_keybindings_with_xmodmap, KeyEventHandler, MouseEventHandler,
             MouseState,
         },
         Config, WindowManager,
@@ -29,14 +29,23 @@ fn raw_key_bindings() -> HashMap<String, Box<dyn KeyEventHandler<RustConn>>> {
     let mut raw_bindings = map! {
         map_keys: |k: &str| k.to_string();
 
+        "XF86MonBrightnessUp" => spawn("xbacklight +5"),
+        "XF86MonBrightnessDown" => spawn("xbacklight -5"),
+        "XF86AudioRaiseVolume" => spawn("pulsemixer --change-volume +5"),
+        "XF86AudioLowerVolume" => spawn("pulsemixer --change-volume -5"),
+        "XF86AudioMute" => spawn("pulsemixer --toggle-mute"),
+        // "XF86AudioMicMute" => spawn("pulsemixer --list-sources | awk '{print \"pulsemixer --toggle-mute --id \"$3}' FS='[ ,]' | sh"),
+        "Print" => spawn("scrot -s"),
         "M-u" => modify_with(|cs| cs.focus_down()),
         "M-o" => modify_with(|cs| cs.focus_up()),
         "M-l" => modify_with(|cs| cs.swap_down()),
         "M-j" => modify_with(|cs| cs.swap_up()),
         "M-S-c" => modify_with(|cs| cs.kill_focused()),
         "M-Tab" => modify_with(|cs| cs.toggle_tag()),
-        // "M-bracketright" => modify_with(|cs| cs.next_screen()),
-        // "M-bracketleft" => modify_with(|cs| cs.previous_screen()),
+        "M-w" => modify_with(|cs| cs.focus_screen(0)),
+        "M-e" => modify_with(|cs| cs.focus_screen(1)),
+        "M-S-e" => modify_with(|cs| cs.move_focused_to_screen(1)),
+        "M-S-w" => modify_with(|cs| cs.move_focused_to_screen(0)),
         "M-space" => modify_with(|cs| cs.next_layout()),
         "M-S-space" => modify_with(|cs| cs.previous_layout()),
         "M-S-i" => send_layout_message(|| IncMain(1)),
@@ -45,10 +54,13 @@ fn raw_key_bindings() -> HashMap<String, Box<dyn KeyEventHandler<RustConn>>> {
         "M-S-j" => send_layout_message(|| ShrinkMain),
         "M-p" => spawn("dmenu_run -c -l 14 -g 4"),
         "M-S-Return" => spawn("st"),
-        "M-d" => spawn("discord"),
+        "M-d" => spawn("vesktop"),
         "M-F7" => spawn("iwd-dmenu"),
         "M-S-q" => spawn("pkill -fi penrose"),
+        "M-f" => spawn("firefox"),
+        "M-S-f" => spawn("firefox --private-window"),
         "M-q" => exit(),
+        "M-t" => sink_focused(),
     };
 
     for tag in &["1", "2", "3", "4", "5", "6", "7", "8", "9"] {
@@ -69,16 +81,16 @@ fn raw_key_bindings() -> HashMap<String, Box<dyn KeyEventHandler<RustConn>>> {
 
 fn mouse_bindings() -> HashMap<MouseState, Box<dyn MouseEventHandler<RustConn>>> {
     use penrose::core::bindings::{
-        ModifierKey::{Meta, Shift},
-        MouseButton::{Left, Middle, Right},
+        ModifierKey::{Meta},
+        MouseButton::{Left, Right},
     };
 
     map! {
         map_keys: |(button, modifiers)| MouseState { button, modifiers };
 
-        (Left, vec![Shift, Meta]) => MouseDragHandler::boxed_default(),
-        (Right, vec![Shift, Meta]) => MouseResizeHandler::boxed_default(),
-        (Middle, vec![Shift, Meta]) => click_handler(sink_focused()),
+        (Left, vec![Meta]) => MouseDragHandler::boxed_default(),
+        (Right, vec![Meta]) => MouseResizeHandler::boxed_default(),
+        // (Middle, vec![Shift, Meta]) => click_handler(sink_focused()),
     }
 }
 
