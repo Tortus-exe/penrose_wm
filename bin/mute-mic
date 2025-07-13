@@ -1,0 +1,2 @@
+#!/bin/bash
+pulsemixer --list-sources | awk '{print "pulsemixer --toggle-mute --id "$3}' FS='[ ,]' | sh
